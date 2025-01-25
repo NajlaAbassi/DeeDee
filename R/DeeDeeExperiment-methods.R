@@ -84,7 +84,7 @@ setMethod("dea",
 #' @rdname DeeDeeExperiment-methods
 #' @export
 setReplaceMethod("dea",
-                 c("DeeDeeExperiment", "list"),
+                 signature = c("DeeDeeExperiment", "list"),
                  definition = function(x, value) {
                    x@dea <- value
                    validObject(x)
@@ -100,11 +100,16 @@ setMethod("add_dea",
           signature = c("DeeDeeExperiment", "list"),
           definition = function(x, dea) {
             # dde must be a DeeDeeExp
+            # should we add check explicity??
             # dea must be named list
 
             # check that names are all unique, and do not overlap with the existing ones
             names(dea)
             names(dea(x))
+
+            if (anyDuplicated(c(names(dea), names(dea(x))))) {
+              stop("Names in 'dea' must be unique!")
+            }
 
             dea_contrasts <- dea(x)
             dde_ids <- rownames(x)
@@ -137,7 +142,7 @@ setMethod("add_dea",
               }
             }
 
-            # update the deslot
+            # update the dea slot
             dea(x) <- dea_contrasts
 
             # check here the validity
@@ -150,6 +155,7 @@ setMethod("add_dea",
 
 # TODO: might need one where I also simply add ONE single DE object, and that gets autoconverted to a named list (of length 1)
 
+# TODO: complete method for when de results are from edgeR and limma
 
 
 #' @rdname DeeDeeExperiment-methods
@@ -163,7 +169,11 @@ setMethod("remove_dea",
             deas <- names(dea(x))
 
             deas_to_remove <- intersect(dea_name, deas)
+
             # warning() if nothing to remove
+            if(length(deas_to_remove) == 0){
+              warning("No matching dea entries found to remove.")
+            }
 
             for (i in deas_to_remove) {
               cols_to_remove <- c(paste0(i, c("_log2FoldChange", "_pvalue", "_padj")))
@@ -199,8 +209,16 @@ setMethod("get_dea_df",
             rd_info <- paste0(dea_name,
                               c("_log2FoldChange", "_pvalue", "_padj"))
 
-            if (! all(rd_info %in% colnames(rowData(x)))) {
-              stop("Columns not found")
+            # if (!all(rd_info %in% colnames(rowData(x)))) {
+            #   stop("Columns not found")
+            # }
+
+            # check for missing columns, for a more precise feedback on the error
+            missing_cols <- rd_info[!rd_info %in% colnames(rowData(x))]
+
+            if (length(missing_cols) > 0) {
+              stop("The following columns are missing: ",
+                   paste(missing_cols, collapse = ", "))
             }
 
             out <- rowData(x)[, rd_info]
@@ -224,10 +242,10 @@ setMethod("get_dea_list",
               colnames(dea_list[[i]]) <- c("log2FoldChange", "pvalue", "padj")
             }
 
+
             return(dea_list)
           }
 )
-
 
 
 
