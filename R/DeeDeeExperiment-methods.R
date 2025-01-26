@@ -162,16 +162,16 @@ setMethod("add_dea",
 
                 # store metadata
                 dea_contrasts[[i]] <- list(
-                  alpha           = NA,
-                  lfcThreshold    = NA,
-                  metainfo_logFC  = NA,
+                  alpha = NA,
+                  lfcThreshold = NA,
+                  metainfo_logFC = res_tbl$comparison,
                   metainfo_pvalue = NA,
                   original_object = this_de,
-                  package         = "limma"
+                  package = "limma"
                 )
               }
               else {
-                stop("The dea result '", i, "' is not recognized (only DESeqResults, MArrayLM, DGEExact or DGELRT). Skipping.")
+                stop("The dea result '", i, "' is not recognized (only DESeqResults, MArrayLM, DGEExact or DGELRT)")
               }
             }
 
@@ -188,7 +188,7 @@ setMethod("add_dea",
 
 # TODO: might need one where I also simply add ONE single DE object, and that gets autoconverted to a named list (of length 1)
 
-# TODO: complete method for when de results are from edgeR and limma
+# TODO: complete method for when de results are from edgeR
 
 
 #' @rdname DeeDeeExperiment-methods
