@@ -55,6 +55,7 @@
 #' @importFrom methods show as callNextMethod is new validObject
 #'
 #' @name DeeDee-pkg
+#' @docType package
 "_PACKAGE"
 NULL
 
