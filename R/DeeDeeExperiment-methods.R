@@ -140,6 +140,39 @@ setMethod("add_dea",
                   package = "DESeq2"
                 )
               }
+              else if (is(this_de, "MArrayLM")) {
+                res_tbl <- topTable(
+                  this_de,
+                  coef    = 2,
+                  number  = nrow(this_de),
+                  sort.by = "none"
+                )
+
+                matched_ids <- match(rownames(res_tbl), rownames(x))
+
+                # if not tested, add NA - everywhere? -> pre-fill?
+                rowData(x)[[paste0(i,"_log2FoldChange")]] <- NA
+                rowData(x)[[paste0(i,"_pvalue")]]         <- NA
+                rowData(x)[[paste0(i,"_padj")]]           <- NA
+
+                # populate using limma columns
+                rowData(x)[[paste0(i,"_log2FoldChange")]][matched_ids] <- res_tbl$logFC
+                rowData(x)[[paste0(i,"_pvalue")]][matched_ids]         <- res_tbl$P.Value
+                rowData(x)[[paste0(i,"_padj")]][matched_ids]           <- res_tbl$adj.P.Val
+
+                # store metadata
+                dea_contrasts[[i]] <- list(
+                  alpha           = NA,
+                  lfcThreshold    = NA,
+                  metainfo_logFC  = NA,
+                  metainfo_pvalue = NA,
+                  original_object = this_de,
+                  package         = "limma"
+                )
+              }
+              else {
+                stop("The dea result '", i, "' is not recognized (only DESeqResults, MArrayLM, DGEExact or DGELRT). Skipping.")
+              }
             }
 
             # update the dea slot
