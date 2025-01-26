@@ -342,10 +342,19 @@ DeeDeeExperiment <- function(se = NULL,
 #' @examples
 #' # TODO example
 #' # ... limma_de <- lmFit
-#' # will provide the outout of lmFit - see its examples
+#' # will provide the output of lmFit - see its examples
 .importDE_limma <- function(se, res_de, de_name) {
   # checks object
   stopifnot(is(res_de, "MArrayLM"))
+
+  # make sure there are at least 2 coefficients
+  if (ncol(res_de$coefficients) < 2) { # we still need to manage the handling of 1 contrast
+    warning(
+      "The provided MArrayLM object has only ",
+      ncol(res_de$coefficients),
+      " coefficient(s). At least 2 are required."
+    )
+  }
 
   # extract columns
   res_tbl <- topTable(res_de,
