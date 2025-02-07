@@ -140,7 +140,35 @@ setMethod("add_dea",
                   package = "DESeq2"
                 )
               }
-              else if (is(this_de, "MArrayLM")) {
+              else if (is(this_de, "DGEExact") || is(this_de, "DGELRT")) {
+                res_tbl <- topTags(
+                  this_de,
+                  n = nrow(this_de),
+                  sort.by = "none"
+                )
+
+                matched_ids <- match(rownames(res_tbl), rownames(x))
+
+                # if not tested, add NA - everywhere? -> pre-fill?
+                rowData(x)[[paste0(i,"_log2FoldChange")]] <- NA
+                rowData(x)[[paste0(i,"_pvalue")]]         <- NA
+                rowData(x)[[paste0(i,"_padj")]]           <- NA
+
+                # populate using edgeR columns
+                rowData(x)[[paste0(i,"_log2FoldChange")]][matched_ids] <- res_tbl$table$logFC
+                rowData(x)[[paste0(i,"_pvalue")]][matched_ids]         <- res_tbl$table$PValue
+                rowData(x)[[paste0(i,"_padj")]][matched_ids]           <- res_tbl$table$FDR
+
+                # store metadata
+                dea_contrasts[[i]] <- list(
+                  alpha = NA,
+                  lfcThreshold = NA,
+                  metainfo_logFC = res_tbl$comparison,
+                  metainfo_pvalue = NA,
+                  original_object = this_de,
+                  package = "edgeR"
+                )
+              } else if (is(this_de, "MArrayLM")) {
                 res_tbl <- topTable(
                   this_de,
                   coef    = 2,
