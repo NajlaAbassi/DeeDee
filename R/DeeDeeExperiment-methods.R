@@ -136,6 +136,10 @@ setMethod("add_dea",
                 rowData(x)[[paste0(i,"_pvalue")]] <- NA
                 rowData(x)[[paste0(i,"_padj")]] <- NA
 
+                # make sure to avoid 'NAs are not allowed in subscripted assignments'
+                rowData(x)[[paste0(i,"_log2FoldChange")]][!is.na(matched_ids)] <- this_de$log2FoldChange
+                rowData(x)[[paste0(i,"_pvalue")]][!is.na(matched_ids)] <- this_de$pvalue
+                rowData(x)[[paste0(i,"_padj")]][!is.na(matched_ids)] <- this_de$padj
 
                 dea_contrasts[[i]] <- list(
                   alpha = metadata(this_de)$alpha,
@@ -161,9 +165,9 @@ setMethod("add_dea",
                 rowData(x)[[paste0(i,"_padj")]]           <- NA
 
                 # populate using edgeR columns
-                rowData(x)[[paste0(i,"_log2FoldChange")]][matched_ids] <- res_tbl$table$logFC
-                rowData(x)[[paste0(i,"_pvalue")]][matched_ids]         <- res_tbl$table$PValue
-                rowData(x)[[paste0(i,"_padj")]][matched_ids]           <- res_tbl$table$FDR
+                rowData(x)[[paste0(i,"_log2FoldChange")]][!is.na(matched_ids)] <- res_tbl$table$logFC
+                rowData(x)[[paste0(i,"_pvalue")]][!is.na(matched_ids)]         <- res_tbl$table$PValue
+                rowData(x)[[paste0(i,"_padj")]][!is.na(matched_ids)]           <- res_tbl$table$FDR
 
                 # store metadata
                 dea_contrasts[[i]] <- list(
@@ -190,9 +194,9 @@ setMethod("add_dea",
                 rowData(x)[[paste0(i,"_padj")]]           <- NA
 
                 # populate using limma columns
-                rowData(x)[[paste0(i,"_log2FoldChange")]][matched_ids] <- res_tbl$logFC
-                rowData(x)[[paste0(i,"_pvalue")]][matched_ids]         <- res_tbl$P.Value
-                rowData(x)[[paste0(i,"_padj")]][matched_ids]           <- res_tbl$adj.P.Val
+                rowData(x)[[paste0(i,"_log2FoldChange")]][!is.na(matched_ids)] <- res_tbl$logFC
+                rowData(x)[[paste0(i,"_pvalue")]][!is.na(matched_ids)]         <- res_tbl$P.Value
+                rowData(x)[[paste0(i,"_padj")]][!is.na(matched_ids)]           <- res_tbl$adj.P.Val
 
                 # store metadata
                 dea_contrasts[[i]] <- list(
