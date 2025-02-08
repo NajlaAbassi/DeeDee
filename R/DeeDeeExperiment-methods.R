@@ -84,7 +84,7 @@ setMethod("dea",
 #' @rdname DeeDeeExperiment-methods
 #' @export
 setReplaceMethod("dea",
-                 signature = c("DeeDeeExperiment", "list"),
+                 signature = c("DeeDeeExperiment", "ANY"),
                  definition = function(x, value) {
 
                    x@dea <- value
@@ -226,8 +226,8 @@ setMethod("add_dea",
 )
 
 # TODO: might need one where I also simply add ONE single DE object, and that gets autoconverted to a named list (of length 1)
-
-# TODO: complete method for when de results are from edgeR
+## this one was half addressed, dede accepts 1 single DE object now, the corresponding name is still to be generated
+## also add_dea() need a way to handle adding again 1 entry
 
 
 #' @rdname DeeDeeExperiment-methods
