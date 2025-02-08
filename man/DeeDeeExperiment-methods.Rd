@@ -9,7 +9,7 @@
 \alias{get_dea_df}
 \alias{get_dea_list}
 \alias{dea,DeeDeeExperiment-method}
-\alias{dea<-,DeeDeeExperiment,list-method}
+\alias{dea<-,DeeDeeExperiment-method}
 \alias{add_dea,DeeDeeExperiment,list-method}
 \alias{remove_dea,DeeDeeExperiment,character-method}
 \alias{get_dea_df,DeeDeeExperiment,character-method}
@@ -18,7 +18,7 @@
 \usage{
 \S4method{dea}{DeeDeeExperiment}(x)
 
-\S4method{dea}{DeeDeeExperiment,list}(x) <- value
+\S4method{dea}{DeeDeeExperiment}(x) <- value
 
 \S4method{add_dea}{DeeDeeExperiment,list}(x, dea)
 
