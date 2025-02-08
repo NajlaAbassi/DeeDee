@@ -86,29 +86,38 @@ setMethod("dea",
 setReplaceMethod("dea",
                  signature = c("DeeDeeExperiment", "list"),
                  definition = function(x, value) {
+
                    x@dea <- value
                    validObject(x)
+
                    x
                  })
 
 
 # dea info - add, remove, get --------------------------------------------------
-
 #' @rdname DeeDeeExperiment-methods
 #' @export
 setMethod("add_dea",
           signature = c("DeeDeeExperiment", "list"),
           definition = function(x, dea) {
-            # dde must be a DeeDeeExp
-            # should we add check explicity??
-            # dea must be named list
 
-            # check that names are all unique, and do not overlap with the existing ones
+            dea <- .check_de_results(dea)
             names(dea)
             names(dea(x))
 
+            # dde must be a DeeDeeExp
+            if (!is(x, "DeeDeeExperiment")) {
+              stop("x must be DeeDeeExperiment object!")
+            }
+
+            # dea must be named list
+            if (is.null(names(dea))) {
+              stop("dea must be a named list!")
+            }
+
+            # check that names are all unique, and do not overlap with the existing ones
             if (anyDuplicated(c(names(dea), names(dea(x))))) {
-              stop("Names in 'dea' must be unique!")
+              stop("Names in dea must be unique!")
             }
 
             dea_contrasts <- dea(x)
@@ -120,16 +129,13 @@ setMethod("add_dea",
 
               # do different things according to what these objects are
               if(is(this_de, "DESeqResults")) {
-                matched_ids <- match(rownames(x), dde_ids)
+                matched_ids <- match(rownames(x), rownames(this_de))
 
                 # if not tested, add NA - everywhere? -> pre-fill?
                 rowData(x)[[paste0(i,"_log2FoldChange")]] <- NA
                 rowData(x)[[paste0(i,"_pvalue")]] <- NA
                 rowData(x)[[paste0(i,"_padj")]] <- NA
 
-                rowData(x)[[paste0(i,"_log2FoldChange")]][matched_ids] <- this_de$log2FoldChange
-                rowData(x)[[paste0(i,"_pvalue")]][matched_ids] <- this_de$pvalue
-                rowData(x)[[paste0(i,"_padj")]][matched_ids] <- this_de$padj
 
                 dea_contrasts[[i]] <- list(
                   alpha = metadata(this_de)$alpha,
@@ -147,7 +153,7 @@ setMethod("add_dea",
                   sort.by = "none"
                 )
 
-                matched_ids <- match(rownames(res_tbl), rownames(x))
+                matched_ids <- match(rownames(x), rownames(res_tbl))
 
                 # if not tested, add NA - everywhere? -> pre-fill?
                 rowData(x)[[paste0(i,"_log2FoldChange")]] <- NA
@@ -176,7 +182,7 @@ setMethod("add_dea",
                   sort.by = "none"
                 )
 
-                matched_ids <- match(rownames(res_tbl), rownames(x))
+                matched_ids <- match(rownames(x), rownames(res_tbl))
 
                 # if not tested, add NA - everywhere? -> pre-fill?
                 rowData(x)[[paste0(i,"_log2FoldChange")]] <- NA
@@ -199,7 +205,8 @@ setMethod("add_dea",
                 )
               }
               else {
-                stop("The dea result '", i, "' is not recognized (only DESeqResults, MArrayLM, DGEExact or DGELRT)")
+                stop(paste0("The dea result '", i,
+                     "' is not recognized (supported classes: DESeqResults, MArrayLM, DGEExact and DGELRT)"))
               }
             }
 
